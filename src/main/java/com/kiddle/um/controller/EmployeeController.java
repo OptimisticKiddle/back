@@ -7,12 +7,14 @@ import com.kiddle.um.entity.Employee;
 import com.kiddle.um.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -102,9 +104,24 @@ public class EmployeeController {
     public R<Employee> getById(@PathVariable Long id){
         log.info("根据id查询员工信息...");
         Employee employee = employeeService.getById(id);
+
         if(employee != null){
             return R.success(employee);
         }
         return R.error("没有查询到对应员工信息");
+    }
+
+    /**
+     * 删除員工
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        log.info("ids:{}",ids);
+
+        employeeService.removeByIds(ids);
+
+        return R.success("套餐数据删除成功");
     }
 }
