@@ -115,6 +115,6 @@ public class EmployeeController {
 
         employeeService.removeByIds(ids);
 
-        return R.success("套餐数据删除成功");
+        return R.success("删除成功");
     }
 }
