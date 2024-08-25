@@ -3,6 +3,7 @@ package com.kiddle.um.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kiddle.um.common.R;
+import com.kiddle.um.dto.EmployeeQuery;
 import com.kiddle.um.entity.Employee;
 import com.kiddle.um.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,21 +31,12 @@ public class EmployeeController {
      * @param employee
      * @return
      */
-    @PostMapping
+    @PostMapping("/save")
     public R<String> save(HttpServletRequest request,@RequestBody Employee employee){
         log.info("新增员工，员工信息：{}",employee.toString());
 
-        //设置初始密码123456，需要进行md5加密处理
-        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-
         employee.setCreateTime(LocalDateTime.now());
         employee.setUpdateTime(LocalDateTime.now());
-
-        //获得当前登录用户的id
-        Long empId = (Long) request.getSession().getAttribute("employee");
-
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
 
         employeeService.save(employee);
 
@@ -55,12 +47,14 @@ public class EmployeeController {
      * 员工信息分页查询
      * @param page
      * @param pageSize
-     * @param name
+     * @param emp
      * @return
      */
-    @GetMapping("/page")
-    public R<Page> page(int page,int pageSize,String name){
-        log.info("page = {},pageSize = {},name = {}" ,page,pageSize,name);
+    @PostMapping("/page")
+    public R<Page> page(int page, int pageSize, @RequestBody Employee emp){
+        String username = emp.getUsername();
+        String sex = emp.getSex();
+        String status = emp.getStatus();
 
         //构造分页构造器
         Page pageInfo = new Page(page,pageSize);
@@ -68,10 +62,9 @@ public class EmployeeController {
         //构造条件构造器
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper();
         //添加过滤条件
-        queryWrapper.like(StringUtils.isNotEmpty(name),Employee::getName,name);
-        //添加排序条件
-        queryWrapper.orderByDesc(Employee::getUpdateTime);
-
+        queryWrapper.like(StringUtils.isNotEmpty(username),Employee::getUsername,username);
+        queryWrapper.eq(StringUtils.isNotEmpty(sex),Employee::getSex,sex);
+        queryWrapper.eq(StringUtils.isNotEmpty(status),Employee::getStatus,status);
         //执行查询
         employeeService.page(pageInfo,queryWrapper);
 

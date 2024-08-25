@@ -25,11 +25,11 @@ public class Employee implements Serializable {
 
     private String sex;
 
-    private Integer age;
+    private String age;
 
     private String idNumber;
 
-    private Integer status;
+    private String status;
 
     private LocalDateTime createTime;
 
